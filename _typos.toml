@@ -1,0 +1,4 @@
+[files]
+extend-exclude = ["go.mod", "go.sum", "*.js", "*.css", "*.html", "*.map"]
+
+[default.extend-identifiers]

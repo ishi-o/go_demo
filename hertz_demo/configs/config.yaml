@@ -1,0 +1,18 @@
+database:
+  driver: mysql
+  host: 127.0.0.1
+  port: 3306
+  username: root
+  password: password
+  database: hertz_demo
+
+server:
+  port: 8888
+
+log:
+  level: info
+  filename: logs/app.log
+  max_size: 100
+  max_backups: 3
+  max_age: 28
+  compress: true
