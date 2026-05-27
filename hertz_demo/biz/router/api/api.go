@@ -12,7 +12,6 @@ import (
  So don't modify the contents of the file, or your code will be deleted when it is updated.
 */
 
-
 func Register(r *server.Hertz) {
 
 	userGroup := r.Group("/api/v1/users")

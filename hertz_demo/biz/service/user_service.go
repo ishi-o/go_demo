@@ -2,12 +2,13 @@ package service
 
 import (
 	"context"
-	"errors"
 
+	"github.com/ishi-o/go_demo/hertz_demo/biz/common/errors"
 	"github.com/ishi-o/go_demo/hertz_demo/biz/model/entity"
 	"github.com/ishi-o/go_demo/pkg/dal"
 
 	api "github.com/ishi-o/go_demo/hertz_demo/biz/model/api"
+	"gorm.io/gorm"
 )
 
 type UserService struct {
@@ -20,104 +21,41 @@ func NewUserService(userRepo dal.Repository[entity.User]) *UserService {
 	}
 }
 
-func (s *UserService) Create(ctx context.Context, req *api.CreateUserRequest) (*entity.User, error) {
-	if req.Username == "" {
-		return nil, errors.New("username is required")
-	}
-	if req.Email == "" {
-		return nil, errors.New("email is required")
-	}
-	if req.Password == "" {
-		return nil, errors.New("password is required")
-	}
-
-	existingUser, err := s.userRepo.GetByCondition(ctx, map[string]interface{}{"email": req.Email})
-	if err != nil {
-		return nil, err
-	}
-	if existingUser != nil {
-		return nil, errors.New("email already exists")
-	}
-
-	existingUser, err = s.userRepo.GetByCondition(ctx, map[string]interface{}{"username": req.Username})
-	if err != nil {
-		return nil, err
-	}
-	if existingUser != nil {
-		return nil, errors.New("username already exists")
-	}
-
+func (s *UserService) Create(ctx context.Context, req *api.CreateUserRequest) error {
 	user := entity.UserFromCreateRequest(req)
-
 	if err := user.SetPassword(req.Password); err != nil {
-		return nil, err
+		return err
 	}
 
-	if err := s.userRepo.Create(ctx, user); err != nil {
-		return nil, err
-	}
-
-	return user, nil
+	return s.userRepo.Create(ctx, user)
 }
 
 func (s *UserService) GetByID(ctx context.Context, id int64) (*entity.User, error) {
 	user, err := s.userRepo.GetByID(ctx, id)
 	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, errors.ErrUserNotFound
+		}
 		return nil, err
-	}
-	if user == nil {
-		return nil, errors.New("user not found")
 	}
 	return user, nil
 }
 
-func (s *UserService) Update(ctx context.Context, req *api.UpdateUserRequest) (*entity.User, error) {
+func (s *UserService) Update(ctx context.Context, req *api.UpdateUserRequest) error {
 	user, err := s.userRepo.GetByID(ctx, req.Id)
 	if err != nil {
-		return nil, err
-	}
-	if user == nil {
-		return nil, errors.New("user not found")
-	}
-
-	if req.Email != "" && req.Email != user.Email {
-		existingUser, err := s.userRepo.GetByCondition(ctx, map[string]interface{}{"email": req.Email})
-		if err != nil {
-			return nil, err
+		if err == gorm.ErrRecordNotFound {
+			return errors.ErrUserNotFound
 		}
-		if existingUser != nil && existingUser.ID != user.ID {
-			return nil, errors.New("email already exists")
-		}
-	}
-
-	if req.Username != "" && req.Username != user.Username {
-		existingUser, err := s.userRepo.GetByCondition(ctx, map[string]interface{}{"username": req.Username})
-		if err != nil {
-			return nil, err
-		}
-		if existingUser != nil && existingUser.ID != user.ID {
-			return nil, errors.New("username already exists")
-		}
+		return err
 	}
 
 	user.FromUpdateRequest(req)
 
-	if err := s.userRepo.Update(ctx, user); err != nil {
-		return nil, err
-	}
-
-	return user, nil
+	return s.userRepo.Update(ctx, user)
 }
 
 func (s *UserService) Delete(ctx context.Context, id int64) error {
-	user, err := s.userRepo.GetByID(ctx, id)
-	if err != nil {
-		return err
-	}
-	if user == nil {
-		return errors.New("user not found")
-	}
-
 	return s.userRepo.Delete(ctx, id)
 }
 
