@@ -1,13 +1,13 @@
 database:
   driver: mysql
-  host: 127.0.0.1
+  host: mysql
   port: 3306
   username: root
-  password: password
+  password: root123
   database: hertz_demo
 
 server:
-  port: 8888
+  port: 8080
 
 log:
   level: info

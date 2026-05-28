@@ -4,6 +4,7 @@ import (
 	"github.com/cloudwego/hertz/pkg/app/server"
 
 	handler "github.com/ishi-o/go_demo/hertz_demo/biz/handler/api"
+	"github.com/ishi-o/go_demo/hertz_demo/biz/middleware"
 )
 
 /*
@@ -13,8 +14,16 @@ import (
 */
 
 func Register(r *server.Hertz) {
+	v1Group := r.Group("/api/v1")
+	v1Group.Use(
+		middleware.Logger(),
+		middleware.CORS(),
+		middleware.Auth(),
+		middleware.ErrorHandlerMiddleware(),
+		middleware.RespHandlerMiddleware(),
+	)
 
-	userGroup := r.Group("/api/v1/users")
+	userGroup := v1Group.Group("/users")
 	{
 		userGroup.POST("", handler.CreateUser)
 		userGroup.GET("/:id", handler.GetUser)
