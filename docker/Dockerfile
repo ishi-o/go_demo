@@ -27,7 +27,7 @@ COPY --from=builder /build/hertz_demo/configs ./configs
 
 ENV TZ=Asia/Shanghai
 
-EXPOSE 8080
+EXPOSE 8081
 
 CMD ["./main"]
 

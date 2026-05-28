@@ -9,7 +9,23 @@ clients:
   - url: http://loki:3100/loki/api/v1/push
 
 scrape_configs:
-  - job_name: docker
+  - job_name: gateway
+    docker_sd_configs:
+      - host: unix:///var/run/docker.sock
+        refresh_interval: 5s
+        filters:
+          - name: name
+            values: ["envoy_gateway"]
+    relabel_configs:
+      - source_labels: ["__meta_docker_container_name"]
+        regex: "/(.*)"
+        target_label: "container"
+      - source_labels:
+          ["__meta_docker_container_label_com_docker_compose_service"]
+        target_label: "job"
+        replacement: "gateway"
+
+  - job_name: hertz_demo
     docker_sd_configs:
       - host: unix:///var/run/docker.sock
         refresh_interval: 5s
@@ -20,6 +36,7 @@ scrape_configs:
       - source_labels: ["__meta_docker_container_name"]
         regex: "/(.*)"
         target_label: "container"
-      - source_labels: ["__meta_docker_container_label_com_docker_compose_service"]
+      - source_labels:
+          ["__meta_docker_container_label_com_docker_compose_service"]
         target_label: "job"
         replacement: "hertz_demo"

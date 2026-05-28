@@ -6,14 +6,11 @@ import (
 	"time"
 
 	"github.com/cloudwego/hertz/pkg/app"
-	"github.com/ishi-o/go_demo/pkg/log"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
-	"go.uber.org/zap"
 )
 
 var (
-	// Prometheus 指标
 	requestsTotal = promauto.NewCounterVec(
 		prometheus.CounterOpts{
 			Name: "http_requests_total",
@@ -45,7 +42,6 @@ func Logger() app.HandlerFunc {
 		start := time.Now()
 		method := string(c.Method())
 		path := c.URI().String()
-		requestID := c.GetHeader("X-Request-ID")
 
 		requestsInProgress.WithLabelValues(method, path).Inc()
 		c.Next(ctx)
@@ -56,22 +52,5 @@ func Logger() app.HandlerFunc {
 		statusStr := strconv.Itoa(status)
 		requestsTotal.WithLabelValues(method, path, statusStr).Inc()
 		requestDuration.WithLabelValues(method, path, statusStr).Observe(duration.Seconds())
-
-		log.Info("Request processed",
-			zap.String("request_id", string(requestID)),
-			zap.String("method", method),
-			zap.String("path", path),
-			zap.Int("status", status),
-			zap.Duration("duration", duration),
-			zap.String("client_ip", c.ClientIP()),
-			zap.String("user_agent", string(c.GetHeader("User-Agent"))),
-		)
-
-		if err := c.Errors.Last(); err != nil {
-			log.Error("Request error",
-				zap.String("request_id", string(requestID)),
-				zap.Error(err),
-			)
-		}
 	}
 }

@@ -9,5 +9,10 @@ scrape_configs:
 
   - job_name: "hertz_demo"
     static_configs:
-      - targets: ["hertz_demo:8080"]
+      - targets: ["hertz_demo:8081"]
     metrics_path: "/metrics"
+
+  - job_name: "envoy"
+    static_configs:
+      - targets: ["envoy_gateway:9901"]
+    metrics_path: "/stats/prometheus"

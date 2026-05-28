@@ -1,6 +1,6 @@
 {
-    "title": "Hertz Demo Dashboard",
-    "uid": "hertz-demo",
+    "title": "Gateway Logs",
+    "uid": "gateway-logs",
     "editable": true,
     "panels": [
         {
@@ -52,63 +52,29 @@
             ]
         },
         {
-            "title": "Error Rate",
-            "type": "timeseries",
-            "gridPos": {
-                "x": 0,
-                "y": 8,
-                "w": 12,
-                "h": 8
-            },
-            "targets": [
-                {
-                    "expr": "rate(http_requests_total{status=~\"5..\"}[5m])",
-                    "legendFormat": "{{method}} {{path}}",
-                    "datasource": {
-                        "type": "prometheus",
-                        "uid": "PBFA97CFB590B2093"
-                    }
-                }
-            ]
-        },
-        {
-            "title": "Active Requests",
-            "type": "stat",
-            "gridPos": {
-                "x": 12,
-                "y": 8,
-                "w": 12,
-                "h": 8
-            },
-            "targets": [
-                {
-                    "expr": "http_requests_in_progress",
-                    "legendFormat": "Active",
-                    "datasource": {
-                        "type": "prometheus",
-                        "uid": "PBFA97CFB590B2093"
-                    }
-                }
-            ]
-        },
-        {
-            "title": "Application Logs",
+            "title": "Request Details",
             "type": "logs",
             "gridPos": {
                 "x": 0,
-                "y": 16,
+                "y": 8,
                 "w": 24,
-                "h": 8
+                "h": 24
             },
             "targets": [
                 {
-                    "expr": "{container=\"hertz_demo\"}",
+                    "expr": "{container=\"envoy_gateway\"} | json | method != \"\" | line_format \"[{{.timestamp}}] {{.method}} {{.path}} {{.status_code}} {{.duration_ms}}ms upstream={{.upstream_host}} request_id={{.request_id}}\"",
                     "datasource": {
                         "type": "loki",
                         "uid": "P8E80F9AEF21F6940"
                     }
                 }
-            ]
+            ],
+            "options": {
+                "showLabels": false,
+                "showTime": true,
+                "sortOrder": "Descending",
+                "dedupStrategy": "none"
+            }
         }
     ],
     "templating": {
@@ -120,3 +86,4 @@
     },
     "refresh": "5s"
 }
+

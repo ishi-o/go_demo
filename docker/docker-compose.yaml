@@ -1,22 +1,41 @@
 services:
+  envoy-gateway:
+    image: envoyproxy/envoy:v1.28-latest
+    container_name: envoy_gateway
+    ports:
+      - "8080:8080" # HTTP port
+      - "9901:9901" # Admin port
+    volumes:
+      - ./gateway/envoy.yaml:/etc/envoy/envoy.yaml
+    depends_on:
+      - hertz_demo
+    networks:
+      - app-network
+
   hertz_demo:
     build:
       context: ..
       dockerfile: docker/Dockerfile
     container_name: hertz_demo
     ports:
-      - "8080:8080"
+      - "8081:8081"
     environment:
       - APP_ACTIVE_PROFILES=dev
     volumes:
       - ../hertz_demo/configs:/app/configs
     depends_on:
-      - mysql
-      - prometheus
-      - loki
+      mysql:
+        condition: service_healthy
+      prometheus:
+        condition: service_started
+      loki:
+        condition: service_started
+    networks:
+      - app-network
 
   mysql:
     image: mysql:8.0
+    container_name: mysql
     ports:
       - "3306:3306"
     environment:
@@ -24,9 +43,18 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
       - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot123"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
   prometheus:
     image: prom/prometheus:v2.45.0
+    container_name: prometheus
     ports:
       - "9090:9090"
     volumes:
@@ -36,27 +64,38 @@ services:
       - "--config.file=/etc/prometheus/config.yml"
       - "--storage.tsdb.path=/prometheus"
       - "--web.enable-lifecycle"
+    networks:
+      - app-network
 
   loki:
     image: grafana/loki:2.9.0
+    container_name: loki
     ports:
       - "3100:3100"
     volumes:
       - ./monitoring/loki/config.yml:/etc/loki/local-config.yaml
       - loki_data:/loki
     command: -config.file=/etc/loki/local-config.yaml
+    networks:
+      - app-network
 
   promtail:
     image: grafana/promtail:2.9.0
+    container_name: promtail
     volumes:
       - ./monitoring/promtail/config.yml:/etc/promtail/config.yml
       - /var/run/docker.sock:/var/run/docker.sock
     command: -config.file=/etc/promtail/config.yml
     depends_on:
       - loki
+      - envoy-gateway
+      - hertz_demo
+    networks:
+      - app-network
 
   grafana:
     image: grafana/grafana:10.0.0
+    container_name: grafana
     ports:
       - "3000:3000"
     environment:
@@ -69,9 +108,15 @@ services:
     depends_on:
       - prometheus
       - loki
+    networks:
+      - app-network
 
 volumes:
   mysql_data:
   prometheus_data:
   loki_data:
   grafana_data:
+
+networks:
+  app-network:
+    driver: bridge
