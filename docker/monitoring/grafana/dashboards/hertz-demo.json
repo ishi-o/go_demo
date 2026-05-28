@@ -102,7 +102,7 @@
             },
             "targets": [
                 {
-                    "expr": "{job=\"hertz_demo\"}",
+                    "expr": "{container=\"hertz_demo\"}",
                     "datasource": {
                         "type": "loki",
                         "uid": "P8E80F9AEF21F6940"

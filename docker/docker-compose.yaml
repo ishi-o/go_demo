@@ -1,10 +1,9 @@
-version: "3.8"
-
 services:
   hertz_demo:
     build:
       context: ..
       dockerfile: docker/Dockerfile
+    container_name: hertz_demo
     ports:
       - "8080:8080"
     environment:
@@ -31,10 +30,10 @@ services:
     ports:
       - "9090:9090"
     volumes:
-      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./monitoring/prometheus/config.yml:/etc/prometheus/config.yml
       - prometheus_data:/prometheus
     command:
-      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--config.file=/etc/prometheus/config.yml"
       - "--storage.tsdb.path=/prometheus"
       - "--web.enable-lifecycle"
 
@@ -43,9 +42,18 @@ services:
     ports:
       - "3100:3100"
     volumes:
-      - ./monitoring/loki/loki-config.yml:/etc/loki/local-config.yaml
+      - ./monitoring/loki/config.yml:/etc/loki/local-config.yaml
       - loki_data:/loki
     command: -config.file=/etc/loki/local-config.yaml
+
+  promtail:
+    image: grafana/promtail:2.9.0
+    volumes:
+      - ./monitoring/promtail/config.yml:/etc/promtail/config.yml
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: -config.file=/etc/promtail/config.yml
+    depends_on:
+      - loki
 
   grafana:
     image: grafana/grafana:10.0.0
