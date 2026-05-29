@@ -6,6 +6,7 @@ import (
 	"github.com/ishi-o/go_demo/hertz_demo/biz/common/errors"
 	"github.com/ishi-o/go_demo/hertz_demo/biz/model/entity"
 	"github.com/ishi-o/go_demo/pkg/dal"
+	"github.com/ishi-o/go_demo/pkg/id"
 
 	api "github.com/ishi-o/go_demo/hertz_demo/biz/model/api"
 	"gorm.io/gorm"
@@ -23,6 +24,8 @@ func NewUserService(userRepo dal.Repository[entity.User]) *UserService {
 
 func (s *UserService) Create(ctx context.Context, req *api.CreateUserRequest) error {
 	user := entity.UserFromCreateRequest(req)
+
+	user.ID = id.MustGenerate()
 	if err := user.SetPassword(req.Password); err != nil {
 		return err
 	}
@@ -30,7 +33,7 @@ func (s *UserService) Create(ctx context.Context, req *api.CreateUserRequest) er
 	return s.userRepo.Create(ctx, user)
 }
 
-func (s *UserService) GetByID(ctx context.Context, id int64) (*entity.User, error) {
+func (s *UserService) GetByID(ctx context.Context, id string) (*entity.User, error) {
 	user, err := s.userRepo.GetByID(ctx, id)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
@@ -55,7 +58,7 @@ func (s *UserService) Update(ctx context.Context, req *api.UpdateUserRequest) er
 	return s.userRepo.Update(ctx, user)
 }
 
-func (s *UserService) Delete(ctx context.Context, id int64) error {
+func (s *UserService) Delete(ctx context.Context, id string) error {
 	return s.userRepo.Delete(ctx, id)
 }
 
@@ -72,7 +75,7 @@ func (s *UserService) List(ctx context.Context, req *api.ListUsersRequest) ([]*e
 		pageSize = 100
 	}
 
-	condition := map[string]interface{}{}
+	condition := map[string]any{}
 	if req.Status > 0 {
 		condition["status"] = int32(req.Status)
 	}

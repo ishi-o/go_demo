@@ -62,7 +62,7 @@
             },
             "targets": [
                 {
-                    "expr": "{container=\"hertz_demo\"}",
+                    "expr": "{container=\"hertz_demo\"} | json | __error__=\"\" | line_format \"{{ .msg }}{{ if .error }} {{ .error }}{{ end }}\"",
                     "datasource": {
                         "type": "loki",
                         "uid": "P8E80F9AEF21F6940"
@@ -70,10 +70,12 @@
                 }
             ],
             "options": {
-                "showLabels": true,
+                "showLabels": false,
                 "showTime": true,
                 "sortOrder": "Descending",
-                "dedupStrategy": "none"
+                "dedupStrategy": "none",
+                "wrapLogMessage": false,
+                "enableLogDetails": true
             }
         }
     ],

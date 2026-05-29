@@ -1,14 +1,13 @@
 version: v2
-
 modules:
-  - path: idl
-
+  - path: ./idl
 breaking:
   use:
     - FILE
-
 lint:
   use:
     - STANDARD
   except:
     - PACKAGE_DIRECTORY_MATCH
+deps:
+  - buf.build/bufbuild/protovalidate

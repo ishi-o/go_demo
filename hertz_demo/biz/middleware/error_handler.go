@@ -2,9 +2,13 @@ package middleware
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/cloudwego/hertz/pkg/app"
+	"github.com/cloudwego/hertz/pkg/protocol/consts"
 	"github.com/ishi-o/go_demo/hertz_demo/biz/common/response"
+	"github.com/ishi-o/go_demo/pkg/log"
+	"go.uber.org/zap"
 )
 
 func ErrorHandlerMiddleware() app.HandlerFunc {
@@ -12,7 +16,11 @@ func ErrorHandlerMiddleware() app.HandlerFunc {
 		c.Next(ctx)
 
 		if err := c.Errors.Last(); err != nil {
-			response.Error(c, 500, "")
+			log.Warn(
+				"error happened",
+				zap.String("error", fmt.Sprintf("%+v", err.Err)),
+			)
+			response.Error(c, consts.StatusInternalServerError, "")
 			return
 		}
 	}

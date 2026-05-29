@@ -3,11 +3,13 @@ package main
 import (
 	"fmt"
 
+	"buf.build/go/protovalidate"
 	"github.com/ishi-o/go_demo/hertz_demo/biz/container"
 	"github.com/ishi-o/go_demo/hertz_demo/biz/model/entity"
-	"go.uber.org/zap"
+	"google.golang.org/protobuf/proto"
 
 	"github.com/cloudwego/hertz/pkg/app/server"
+	"github.com/cloudwego/hertz/pkg/protocol"
 	"github.com/ishi-o/go_demo/pkg/config"
 	"github.com/ishi-o/go_demo/pkg/log"
 	"gorm.io/driver/mysql"
@@ -47,9 +49,13 @@ func main() {
 
 	h := server.Default(
 		server.WithHostPorts(fmt.Sprintf(":%d", cfg.Server.Port)),
+		server.WithCustomValidatorFunc(func(_ *protocol.Request, req any) error {
+			if msg, ok := req.(proto.Message); ok {
+				return protovalidate.Validate(msg)
+			}
+			return nil
+		}),
 	)
-	log.Info("AppActiveProfiles:", zap.Strings("string", cfg.App.ActiveProfiles))
-
 	register(h)
 
 	h.Spin()

@@ -10,7 +10,7 @@ import (
 )
 
 type User struct {
-	ID           int64          `gorm:"primaryKey;autoIncrement"`
+	ID           string         `gorm:"primaryKey;type:char(36);uniqueIndex"`
 	Username     string         `gorm:"uniqueIndex;size:64;not null"`
 	Email        string         `gorm:"uniqueIndex;size:128;not null"`
 	Phone        string         `gorm:"size:20"`

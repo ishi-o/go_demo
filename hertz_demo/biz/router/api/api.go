@@ -19,8 +19,8 @@ func Register(r *server.Hertz) {
 		middleware.Logger(),
 		middleware.CORS(),
 		middleware.Auth(),
-		middleware.ErrorHandlerMiddleware(),
 		middleware.RespHandlerMiddleware(),
+		middleware.ErrorHandlerMiddleware(),
 	)
 
 	userGroup := v1Group.Group("/users")

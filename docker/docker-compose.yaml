@@ -23,6 +23,7 @@ services:
       - APP_ACTIVE_PROFILES=dev
     volumes:
       - ../hertz_demo/configs:/app/configs
+      - go_mod_cache:/go/pkg/mod
     depends_on:
       mysql:
         condition: service_healthy
@@ -46,7 +47,8 @@ services:
     networks:
       - app-network
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot123"]
+      test:
+        ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot123"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -116,6 +118,7 @@ volumes:
   prometheus_data:
   loki_data:
   grafana_data:
+  go_mod_cache:
 
 networks:
   app-network:

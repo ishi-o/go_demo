@@ -47,13 +47,13 @@ func ListUsers(ctx context.Context, c *app.RequestContext) {
 
 func (h *UserHandler) CreateUser(ctx context.Context, c *app.RequestContext) {
 	var req api.CreateUserRequest
-	if err := c.Bind(&req); err != nil {
-		c.Error(errors.ErrInvalidRequest)
+	if err := c.BindAndValidate(&req); err != nil {
+		errors.WrapWithStack(c, errors.ErrInvalidRequest)
 		return
 	}
 
 	if err := h.userService.Create(ctx, &req); err != nil {
-		c.Error(err)
+		errors.WrapWithStack(c, err)
 		return
 	}
 
@@ -62,14 +62,14 @@ func (h *UserHandler) CreateUser(ctx context.Context, c *app.RequestContext) {
 
 func (h *UserHandler) GetUser(ctx context.Context, c *app.RequestContext) {
 	var req api.GetUserRequest
-	if err := c.Bind(&req); err != nil {
-		c.Error(errors.ErrInvalidRequest)
+	if err := c.BindAndValidate(&req); err != nil {
+		errors.WrapWithStack(c, errors.ErrInvalidRequest)
 		return
 	}
 
 	user, err := h.userService.GetByID(ctx, req.Id)
 	if err != nil {
-		c.Error(err)
+		errors.WrapWithStack(c, err)
 		return
 	}
 
@@ -78,13 +78,13 @@ func (h *UserHandler) GetUser(ctx context.Context, c *app.RequestContext) {
 
 func (h *UserHandler) UpdateUser(ctx context.Context, c *app.RequestContext) {
 	var req api.UpdateUserRequest
-	if err := c.Bind(&req); err != nil {
-		c.Error(errors.ErrInvalidRequest)
+	if err := c.BindAndValidate(&req); err != nil {
+		errors.WrapWithStack(c, errors.ErrInvalidRequest)
 		return
 	}
 
 	if err := h.userService.Update(ctx, &req); err != nil {
-		c.Error(err)
+		errors.WrapWithStack(c, err)
 		return
 	}
 
@@ -93,13 +93,13 @@ func (h *UserHandler) UpdateUser(ctx context.Context, c *app.RequestContext) {
 
 func (h *UserHandler) DeleteUser(ctx context.Context, c *app.RequestContext) {
 	var req api.DeleteUserRequest
-	if err := c.Bind(&req); err != nil {
-		c.Error(errors.ErrInvalidRequest)
+	if err := c.BindAndValidate(&req); err != nil {
+		errors.WrapWithStack(c, errors.ErrInvalidRequest)
 		return
 	}
 
 	if err := h.userService.Delete(ctx, req.Id); err != nil {
-		c.Error(err)
+		errors.WrapWithStack(c, err)
 		return
 	}
 
@@ -108,14 +108,14 @@ func (h *UserHandler) DeleteUser(ctx context.Context, c *app.RequestContext) {
 
 func (h *UserHandler) ListUsers(ctx context.Context, c *app.RequestContext) {
 	var req api.ListUsersRequest
-	if err := c.Bind(&req); err != nil {
-		c.Error(errors.ErrInvalidRequest)
+	if err := c.BindAndValidate(&req); err != nil {
+		errors.WrapWithStack(c, errors.ErrInvalidRequest)
 		return
 	}
 
 	users, total, err := h.userService.List(ctx, &req)
 	if err != nil {
-		c.Error(err)
+		errors.WrapWithStack(c, err)
 		return
 	}
 

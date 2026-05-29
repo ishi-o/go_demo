@@ -6,12 +6,12 @@ import (
 )
 
 type Response struct {
-	Code    int         `json:"code"`
-	Message interface{} `json:"message"`
-	Body    interface{} `json:"body"`
+	Code    int `json:"code"`
+	Message any `json:"message"`
+	Body    any `json:"body"`
 }
 
-func Success(c *app.RequestContext, data interface{}) {
+func Success(c *app.RequestContext, data any) {
 	c.JSON(consts.StatusOK, Response{
 		Code:    0,
 		Message: nil,
@@ -28,7 +28,7 @@ func SuccessEmpty(c *app.RequestContext) {
 }
 
 func Error(c *app.RequestContext, code int, message string) {
-	c.JSON(consts.StatusOK, Response{
+	c.JSON(code, Response{
 		Code:    code,
 		Message: message,
 		Body:    nil,

@@ -1,5 +1,7 @@
 FROM golang:1.26.2-alpine AS builder
 
+ENV GOPROXY=https://proxy.golang.org,direct
+
 WORKDIR /build
 
 RUN apk add --no-cache git

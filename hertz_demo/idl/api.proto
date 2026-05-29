@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package api.v1;
 
-option go_package = "hertz_demo/biz/model/api";
+import "buf/validate/validate.proto";
 
 service UserService {
   rpc CreateUser(CreateUserRequest) returns (CreateUserResponse);
@@ -17,7 +17,7 @@ service UserService {
 }
 
 message User {
-  int64 id = 1;
+  string id = 1;
   string username = 2;
   string email = 3;
   string phone = 4;
@@ -42,8 +42,8 @@ enum UserStatus {
 }
 
 message CreateUserRequest {
-  string username = 1;
-  string email = 2;
+  string username = 1 [(buf.validate.field).required = true];
+  string email = 2 [(buf.validate.field).required = true];
   string phone = 3;
   int32 age = 4;
   Gender gender = 5;
@@ -51,12 +51,12 @@ message CreateUserRequest {
 }
 
 message CreateUserResponse {
-  int64 id = 1;
+  string id = 1;
   string message = 2;
 }
 
 message GetUserRequest {
-  int64 id = 1;
+  string id = 1;
 }
 
 message GetUserResponse {
@@ -64,7 +64,7 @@ message GetUserResponse {
 }
 
 message UpdateUserRequest {
-  int64 id = 1;
+  string id = 1;
   string username = 2;
   string email = 3;
   string phone = 4;
@@ -79,7 +79,7 @@ message UpdateUserResponse {
 }
 
 message DeleteUserRequest {
-  int64 id = 1;
+  string id = 1;
 }
 
 message DeleteUserResponse {
