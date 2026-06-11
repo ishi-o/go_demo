@@ -17,7 +17,7 @@ func ErrorHandlerMiddleware() app.HandlerFunc {
 
 		if err := c.Errors.Last(); err != nil {
 			log.Warn(
-				"error happened",
+				"error: "+err.Error()+"\n",
 				zap.String("error", fmt.Sprintf("%+v", err.Err)),
 			)
 			response.Error(c, consts.StatusInternalServerError, "")

@@ -70,12 +70,14 @@
                 }
             ],
             "options": {
+                "dedupStrategy": "none",
+                "enableLogDetails": true,
+                "prettifyLogMessage": false,
+                "showCommonLabels": false,
                 "showLabels": false,
                 "showTime": true,
                 "sortOrder": "Descending",
-                "dedupStrategy": "none",
-                "wrapLogMessage": false,
-                "enableLogDetails": true
+                "wrapLogMessage": false
             }
         }
     ],
