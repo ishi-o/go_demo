@@ -28,6 +28,11 @@ type DatabaseConfig struct {
 	Database string `mapstructure:"database"`
 }
 
+type RabbitMQConfig struct {
+	URL      string
+	PoolSize int
+}
+
 type ServerConfig struct {
 	Port int `mapstructure:"port"`
 }
